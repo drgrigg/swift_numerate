@@ -169,15 +169,28 @@ func writeLineToFile(line:String, filename:String)
 
 func processFileWithOptions(filepath:String, pattern:String, options:Optional)
 {
-    let sr = StreamReader(path: filepath)
+  /*  let sr = StreamReader(path: filepath)
     
     guard sr != nil else {
         print (filepath + ": file does not exist!")
         return
     }
+
     
     while let line = sr?.nextLine()
     {
+  */
+    var lines: [String] = []
+    do
+    {
+        let wholetext = try String(contentsOfFile: filepath, encoding: String.Encoding.utf8)
+        lines = wholetext.components(separatedBy: "\n")
+    }
+    catch let err as NSError {
+        print(err.description)
+    }
+    
+    for line in lines {
         let results = extractMatches(for: pattern,in: line)
         
         pieces.removeAll(keepingCapacity: false)
