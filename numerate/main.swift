@@ -10,12 +10,15 @@ import Foundation
 
 struct Optional
 {
+    var Regexpression = "(\\d{1,10})"
     var Romanise = false
     var Lowercase = false
     var Increment = false
     var IncrementBy = 0
     var TargetResult = false
     var TargetResultNum = 0
+    var ForceEnd = false
+    var ForceEndAfter = 0
     var Output = false
     var OutputTo = ""
 }
@@ -167,19 +170,8 @@ func writeLineToFile(line:String, filename:String)
     }
 }
 
-func processFileWithOptions(filepath:String, pattern:String, options:Optional)
+func processFileWithOptions(filepath:String, options:Optional)
 {
-  /*  let sr = StreamReader(path: filepath)
-    
-    guard sr != nil else {
-        print (filepath + ": file does not exist!")
-        return
-    }
-
-    
-    while let line = sr?.nextLine()
-    {
-  */
     var lines: [String] = []
     do
     {
@@ -190,8 +182,23 @@ func processFileWithOptions(filepath:String, pattern:String, options:Optional)
         print(err.description)
     }
     
+    let pattern = options.Regexpression
+    var numFinds = 0
+    
     for line in lines {
+        
+        if (options.ForceEnd && numFinds >= options.ForceEndAfter)
+        {
+            print(line)
+            if (options.Output)
+            {
+                bulktext += line + "\n"
+            }
+            continue //skip to next line
+        }
+        
         let results = extractMatches(for: pattern,in: line)
+        if results.count > 0 { numFinds += 1 }
         
         pieces.removeAll(keepingCapacity: false)
         
@@ -202,12 +209,12 @@ func processFileWithOptions(filepath:String, pattern:String, options:Optional)
             ranges.append(result.range(at: 1))
         }
         
-        if (options.TargetResult)
+        if (options.TargetResult) && (options.TargetResultNum > 0)
         {
-            if (options.TargetResultNum >= 0) && (options.TargetResultNum < ranges.count)
+            if (options.TargetResultNum < ranges.count)
             {
                 //just restrict ranges to the targeted item
-                let temp = ranges[options.TargetResultNum]
+                let temp = ranges[options.TargetResultNum - 1]
                 ranges = [temp]
             }
             else
@@ -308,7 +315,20 @@ func GetOptional(arguments:[String]) -> Optional
                 if let dec = Int(args[argnum])
                 {
                     opts.TargetResult = true
-                    opts.TargetResultNum = dec - 1 //adjust for zero-based collections
+                    opts.TargetResultNum = dec
+                }
+            }
+        }
+        
+        if (argnum < args.count) && (args[argnum].lowercased() == "-e")
+        {
+            argnum += 1
+            if (argnum < args.count)
+            {
+                if let dec = Int(args[argnum])
+                {
+                    opts.ForceEnd = true
+                    opts.ForceEndAfter = dec
                 }
             }
         }
@@ -322,6 +342,16 @@ func GetOptional(arguments:[String]) -> Optional
                 opts.OutputTo = args[argnum]
             }
         }
+
+        if (argnum < args.count) && (args[argnum].lowercased() == "-x")
+        {
+            argnum += 1
+            if (argnum < args.count)
+            {
+                opts.Regexpression = args[argnum]
+            }
+        }
+        
         argnum += 1
     } //end while
     return opts
@@ -331,23 +361,27 @@ let args = CommandLine.arguments
 
 if args.count < 2
 {
-    print("Usage: filename [-r] [-a N] [-s N] [-t N] [-o outfilename]")
+    print("Usage: filename [-r] [-a N] [-s N] [-t N] [-e N] [-o outfilename] [-x regex]")
     print(" Options: ")
     print(" -r: convert to Roman numerals ")
     print(" -a: add following integer number (N) ")
     print(" -s: subtract following integer number (N) ")
     print(" -t: target only Nth instance in each line")
+    print(" -e: end transforms after Nth instance in file")
     print(" -o: send output to following filename")
+    print(" -x: use the following regular expression")
+    print ("    : must include capture group")
+    print ("    : backslashes must be escaped ")
+    print("     : eg \"<title>Chapter (\\\\d{1,3})</title>\"")
 }
 else
 {
     //args[0] is the path to the executable
     
     let fileToProcess = args[1]
-    let regex = "(\\d{1,10})"
     
     let opts = GetOptional(arguments: args)
 
-    processFileWithOptions(filepath: fileToProcess, pattern: regex, options: opts)
+    processFileWithOptions(filepath: fileToProcess, options: opts)
 }
 
