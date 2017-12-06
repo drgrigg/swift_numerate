@@ -65,11 +65,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&quot;/Users/david/Dropbox/Standard Ebooks/test.xhtml&quot;"
+            argument = "&quot;/Users/david/Dropbox/Standard Ebooks/Crusoe/chapterlist2.html&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-a 1 -e 2 -t 1"
+            argument = "-p -a  -r -x &quot;&gt;([IVX])&lt;&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
