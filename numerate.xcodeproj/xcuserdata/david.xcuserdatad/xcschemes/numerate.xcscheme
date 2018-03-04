@@ -65,11 +65,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&quot;/Users/david/Dropbox/Standard Ebooks/Crusoe/chapterlist2.html&quot;"
+            argument = "&quot;/Users/david/Dropbox/Standard Ebooks/39Steps/john-buchan_the-thirty-nine-steps/src/epub/text/body.xhtml&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-p -a  -r -x &quot;&gt;([IVX])&lt;&quot;"
+            argument = "-c  -r -x &quot;CHAPTER ([A-Z]{1,12})&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

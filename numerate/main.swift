@@ -12,6 +12,7 @@ struct Optional
 {
     var Regexpression = "(\\d{1,10})"
     var Arabicise = false
+    var ConvertText = false
     var Romanise = false
     var Lowercase = false
     var Increment = false
@@ -208,6 +209,43 @@ func transform(_ changestr:String, options: Optional) -> String
         mutableStr = "\(arabnum)"
     }
     
+    if options.ConvertText
+    {
+        //expecting ONE, TWO, etc
+        let lowercaseText = changestr.lowercased().replacingOccurrences(of: " ", with: "-")
+        var compares = ["","one","two","three","four","five","six","seven","eight","nine",
+                        "ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
+                        "eighteen","nineteen"]
+        let decades = ["twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"]
+        for decade in decades
+        {
+            compares.append(decade)
+            
+            for i in 1...9
+            {
+                compares.append(decade + "-" + compares[i])
+            }
+        }
+        
+        
+        var value = -1
+        for i in 0..<compares.count
+        {
+            if lowercaseText==compares[i]
+            {
+                value = i
+            }
+        }
+        if value != -1
+        {
+            mutableStr = "\(value)"
+        }
+        else
+        {
+            return changestr //get out without doing anything
+        }
+    }
+    
     if let decnum = Int(mutableStr)
     {
         var retnum = decnum
@@ -230,17 +268,17 @@ func transform(_ changestr:String, options: Optional) -> String
     return changestr
 }
 
-func writeLineToFile(line:String, filename:String)
-{
-    do {
-        let ddir = URL(fileURLWithPath:FileManager.default.currentDirectoryPath)
-        let url = ddir.appendingPathComponent(filename)
-        try line.appendLineToURL(fileURL: url as URL)
-    }
-    catch {
-        print("Could not write to file")
-    }
-}
+//func writeLineToFile(line:String, filename:String)
+//{
+//    do {
+//        let ddir = URL(fileURLWithPath:FileManager.default.currentDirectoryPath)
+//        let url = ddir.appendingPathComponent(filename)
+//        try line.appendLineToURL(fileURL: url as URL)
+//    }
+//    catch {
+//        print("Could not write to file")
+//    }
+//}
 
 func processFileWithOptions(filepath:String, options:Optional)
 {
@@ -327,11 +365,13 @@ func processFileWithOptions(filepath:String, options:Optional)
             mutatedLine += piece
         }
         
-        print(mutatedLine)
-        
         if (mutatableOptions.Output)
         {
             bulktext += mutatedLine + "\n"
+        }
+        else
+        {
+            print(mutatedLine)
         }
     }
     if mutatableOptions.Output
@@ -356,6 +396,11 @@ func GetOptional(arguments:[String]) -> Optional
         if args[argnum].lowercased() == "-r"
         {
             opts.Romanise = true
+        }
+        
+        if args[argnum].lowercased() == "-c"
+        {
+            opts.ConvertText = true
         }
         
         if args[argnum].lowercased() == "-a"
@@ -449,10 +494,11 @@ let args = CommandLine.arguments
 
 if args.count < 2
 {
-    print("Usage: filename [-r] [-a] [-p] [-i N] [-d N] [-t N] [-e N] [-o outfilename] [-x regex]")
+    print("Usage: filename [-r] [-a] [-p] [-c] [-i N] [-d N] [-t N] [-e N] [-o outfilename] [-x regex]")
     print(" Options: ")
-    print(" -r: convert to Roman numerals ")
-    print(" -a: convert to Arabic numerals")
+    print(" -r: arabic to Roman numerals ")
+    print(" -a: roman to Arabic numerals")
+    print(" -c: convert text (if possible) to a number")
     print(" -i: increment by following integer number (N) ")
     print(" -p: increment each line by 1")
     print(" -d: decrement by following integer number (N) ")
