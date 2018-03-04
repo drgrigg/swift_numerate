@@ -29,8 +29,8 @@ Options:
 
 > must include capture group
 
-> backslashes must be escaped eg \\
+> backslashes must be escaped eg `\\`
 
-> straight quotation marks must be escaped eg \"
+> straight quotation marks must be escaped eg `\"`
 
 > eg `"<title>Chapter (\\d{1,3})</title>"`
