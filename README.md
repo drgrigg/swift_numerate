@@ -1,4 +1,4 @@
-# numerate
+# swift_numerate
 Command-line utility to process numbers in text files in various ways
 
 Written in Swift for macOS.
